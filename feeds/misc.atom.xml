@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Kishore's Blog - misc</title><link href="/" rel="alternate"></link><link href="/feeds/misc.atom.xml" rel="self"></link><id>/</id><updated>2020-09-07T17:30:00+05:30</updated><entry><title>Elasticsearch Cluster on Google Kubernetes Engine</title><link href="/Elasticsearch-Cluster-on-Google-Kubernetes-Engine.html" rel="alternate"></link><published>2020-09-07T17:30:00+05:30</published><updated>2020-09-07T17:30:00+05:30</updated><author><name>Kishore Chandran</name></author><id>tag:None,2020-09-07:/Elasticsearch-Cluster-on-Google-Kubernetes-Engine.html</id><summary type="html">&lt;p&gt;My experience on creating an Elasticsearch Cluster on Google Kubernetes Engine&lt;/p&gt;</summary><content type="html">&lt;h1&gt;Elasticsearch Cluster on Google Kubernetes Engine&lt;/h1&gt;
+&lt;p&gt;From being an Java Developer this is the first time I am wetting my hands on Elasticsearch and Kubernetes, 
+though I hear a lot about them never really had a chance to work on those. 
+Here I share my experience on creating an Elasticsearch Cluster on Google Kubernetes Engine.&lt;/p&gt;
+&lt;p&gt;These are the following steps involved in the process,&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Provision the required clusters on &lt;a href="https://cloud.google.com/kubernetes-engine"&gt;Google Kubernetes Engine&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Enable the persistent volume via &lt;a href="https://kubernetes.io/docs/concepts/storage/storage-classes/"&gt;Storage Classes&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Enable the Elasticsearch node discovery via &lt;a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services"&gt;Headless Service&lt;/a&gt;.&lt;/li&gt;
+&lt;li&gt;Deploy the Elasticsearch Cluster via &lt;a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/"&gt;Stateful Sets&lt;/a&gt;.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2&gt;Provisioning the Cluster&lt;/h2&gt;</content><category term="misc"></category><category term="Elasticsearch"></category><category term="Kubernetes"></category></entry></feed>

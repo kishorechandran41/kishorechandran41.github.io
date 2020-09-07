@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <meta name="generator" content="Pelican" />
+        <title>Elasticsearch Cluster on Google Kubernetes Engine</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Kishore's Blog Atom Feed" />
+        <meta name="description" content="My experience on creating an Elasticsearch Cluster on Google Kubernetes Engine" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">Kishore's Blog</a></h1>
+                <nav><ul>
+                    <li class="active"><a href="/category/misc.html">misc</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+<section id="content" class="body">
+  <article>
+    <header>
+      <h1 class="entry-title">
+        <a href="/Elasticsearch-Cluster-on-Google-Kubernetes-Engine.html" rel="bookmark"
+           title="Permalink to Elasticsearch Cluster on Google Kubernetes Engine">Elasticsearch Cluster on Google Kubernetes Engine</a></h1>
+    </header>
+
+    <div class="entry-content">
+<footer class="post-info">
+        <abbr class="published" title="2020-09-07T17:30:00+05:30">
+                Published: Mon 07 September 2020
+        </abbr>
+		<br />
+        <abbr class="modified" title="2020-09-07T17:30:00+05:30">
+                Updated: Mon 07 September 2020
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/kishore-chandran.html">Kishore Chandran</a>
+        </address>
+<p>In <a href="/category/misc.html">misc</a>.</p>
+<p>tags: <a href="/tag/elasticsearch.html">Elasticsearch</a> <a href="/tag/kubernetes.html">Kubernetes</a> </p>
+</footer><!-- /.post-info -->      <h1>Elasticsearch Cluster on Google Kubernetes Engine</h1>
+<p>From being an Java Developer this is the first time I am wetting my hands on Elasticsearch and Kubernetes, 
+though I hear a lot about them never really had a chance to work on those. 
+Here I share my experience on creating an Elasticsearch Cluster on Google Kubernetes Engine.</p>
+<p>These are the following steps involved in the process,</p>
+<ol>
+<li>Provision the required clusters on <a href="https://cloud.google.com/kubernetes-engine">Google Kubernetes Engine</a>.</li>
+<li>Enable the persistent volume via <a href="https://kubernetes.io/docs/concepts/storage/storage-classes/">Storage Classes</a>.</li>
+<li>Enable the Elasticsearch node discovery via <a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services">Headless Service</a>.</li>
+<li>Deploy the Elasticsearch Cluster via <a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/">Stateful Sets</a>.</li>
+</ol>
+<h2>Provisioning the Cluster</h2>
+    </div><!-- /.entry-content -->
+
+  </article>
+</section>
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="https://getpelican.com/">Pelican</a></li>
+                            <li><a href="https://www.python.org/">Python.org</a></li>
+                            <li><a href="https://palletsprojects.com/p/jinja/">Jinja2</a></li>
+                            <li><a href="#">You can modify those links in your config file</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
+
+                            <li><a href="#">You can add links in your config file</a></li>
+                            <li><a href="#">Another social link</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
