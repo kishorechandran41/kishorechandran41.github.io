@@ -1,7 +1,7 @@
 Title: Elasticsearch Cluster on Google Kubernetes Engine
 Date: 2020-09-07 17:30
 Modified: 2020-09-07 17:30
-Category: misc
+Category: DevOps
 Tags: Elasticsearch, Kubernetes
 Slug: Elasticsearch-Cluster-on-Google-Kubernetes-Engine
 Authors: Kishore Chandran
