@@ -20,7 +20,7 @@ These are the following steps involved in the process,
 4. Deploy Elasticsearch Cluster using [Stateful Sets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
 
 ## Provisioning the Cluster
-Let us first provision the clusters in Google Kubernetes Engine for our Elasticsearch. We are going to create 3 node pools as below,
+Let us first provision the clusters in Google Kubernetes Engine for our Elasticsearch. We are going to create three node pools as below,
 
 1. master-nodes - 3 nodes with 2vCPU, 8GB Memory and Standard persistent disk of 10GB as default
 2. data-nodes - 5 nodes with 16vCPU, 64GB Memory and Standard persistent disk of 10GB as default
@@ -316,6 +316,7 @@ Now your cluster must be up, confirm the same in Workloads section in the consol
 if all the pods are in running state.
 ```kubectl get pods```
 
+In case you want to add more configurations to the elasticsearch.yaml you can refer [here](https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-elasticsearch-specification.html).
 ## Test Your Cluster
 To verify that your cluster is working fine use the below commands to access the content of the cluster
 
