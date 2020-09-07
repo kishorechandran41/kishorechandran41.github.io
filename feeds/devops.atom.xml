@@ -9,4 +9,4 @@ Here I share my experience on creating an Elasticsearch Cluster on Google Kubern
 &lt;li&gt;Enable the Elasticsearch node discovery via &lt;a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services"&gt;Headless Service&lt;/a&gt;.&lt;/li&gt;
 &lt;li&gt;Deploy the Elasticsearch Cluster via &lt;a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/"&gt;Stateful Sets&lt;/a&gt;.&lt;/li&gt;
 &lt;/ol&gt;
-&lt;h1&gt;Provisioning the Cluster&lt;/h1&gt;</content><category term="DevOps"></category><category term="Elasticsearch"></category><category term="[Kubernetes](https://cloud.google.com/kubernetes-engine)"></category></entry></feed>
+&lt;h1&gt;Provisioning the Cluster&lt;/h1&gt;</content><category term="DevOps"></category><category term="Elasticsearch"></category><category term="Kubernetes"></category></entry></feed>
