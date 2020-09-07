@@ -5,7 +5,6 @@
         <meta name="generator" content="Pelican" />
         <title>Kishore's Blog - Kubernetes</title>
         <link rel="stylesheet" href="/theme/css/main.css" />
-        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Kishore's Blog Atom Feed" />
 </head>
 
 <body id="index" class="home">
@@ -33,18 +32,314 @@
         </address>
 <p>In <a href="/category/devops.html">DevOps</a>.</p>
 <p>tags: <a href="/tag/elasticsearch.html">Elasticsearch</a> <a href="/tag/kubernetes.html">Kubernetes</a> </p>
-</footer><!-- /.post-info --><h1>Elasticsearch Cluster on Google Kubernetes Engine</h1>
-<p>From being an Java Developer this is the first time I am wetting my hands on Elasticsearch and Kubernetes, 
+</footer><!-- /.post-info --><p>From being an Java Developer this is the first time I am wetting my hands on Elasticsearch and Kubernetes, 
 though I hear a lot about them never really had a chance to work on those. 
 Here I share my experience on creating an Elasticsearch Cluster on Google Kubernetes Engine.</p>
 <p>These are the following steps involved in the process,</p>
 <ol>
 <li>Provision the required clusters on <a href="https://cloud.google.com/kubernetes-engine">Google Kubernetes Engine</a>.</li>
-<li>Enable the persistent volume via <a href="https://kubernetes.io/docs/concepts/storage/storage-classes/">Storage Classes</a>.</li>
-<li>Enable the Elasticsearch node discovery via <a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services">Headless Service</a>.</li>
-<li>Deploy the Elasticsearch Cluster via <a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/">Stateful Sets</a>.</li>
+<li>Enable Persistent volume using <a href="https://kubernetes.io/docs/concepts/storage/storage-classes/">Storage Classes</a>.</li>
+<li>Enable Elasticsearch node discovery using <a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services">Headless Service</a>.</li>
+<li>Deploy Elasticsearch Cluster using <a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/">Stateful Sets</a>.</li>
 </ol>
-<h2>Provisioning the Cluster</h2>                </article>
+<h2>Provisioning the Cluster</h2>
+<p>Let us first provision the clusters in Google Kubernetes Engine for our Elasticsearch. We are going to create 3 node pools as below,</p>
+<ol>
+<li>master-nodes - 3 nodes with 2vCPU, 8GB Memory and Standard persistent disk of 10GB as default</li>
+<li>data-nodes - 5 nodes with 16vCPU, 64GB Memory and Standard persistent disk of 10GB as default</li>
+<li>coordinator-only - 5 nodes with 4vCPU, 8GB Memory and Standard persistent disk of 10GB as default</li>
+</ol>
+<p>You can use the below command to provision.</p>
+<div class="highlight"><pre><span></span><code><span class="err">gcloud beta container --project &quot;my-project&quot; clusters create &quot;my-cluster&quot; --zone &quot;us-central1-c&quot; \</span>
+<span class="err">--no-enable-basic-auth --cluster-version &quot;1.15.12-gke.2&quot; --machine-type &quot;e2-standard-2&quot; --image-type &quot;COS&quot; \</span>
+<span class="err">--disk-type &quot;pd-standard&quot; --disk-size &quot;10&quot; --metadata disable-legacy-endpoints=true \</span>
+<span class="err">--scopes &quot;https://www.googleapis.com/auth/devstorage.read_only&quot;,&quot;https://www.googleapis.com/auth/logging.write&quot;,&quot;https://www.googleapis.com/auth/monitoring&quot;,&quot;https://www.googleapis.com/auth/servicecontrol&quot;,&quot;https://www.googleapis.com/auth/service.management.readonly&quot;,&quot;https://www.googleapis.com/auth/trace.append&quot; \</span>
+<span class="err">--num-nodes &quot;3&quot; --enable-stackdriver-kubernetes --enable-ip-alias --network &quot;projects/datamastering/global/networks/default&quot; \</span>
+<span class="err">--subnetwork &quot;projects/datamastering/regions/us-central1/subnetworks/default&quot; --default-max-pods-per-node &quot;110&quot; \</span>
+<span class="err">--no-enable-master-authorized-networks --addons HorizontalPodAutoscaling,HttpLoadBalancing,GcePersistentDiskCsiDriver \</span>
+<span class="err">--enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 &amp;&amp; gcloud beta container \</span>
+<span class="err">--project &quot;datamastering&quot; node-pools create &quot;data-nodes&quot; \</span>
+<span class="err">--cluster &quot;my-cluster&quot; --zone &quot;us-central1-c&quot; --node-version &quot;1.15.12-gke.2&quot; --machine-type &quot;e2-standard-16&quot; --image-type &quot;COS&quot; \</span>
+<span class="err">--disk-type &quot;pd-standard&quot; --disk-size &quot;10&quot; --metadata disable-legacy-endpoints=true \</span>
+<span class="err">--scopes &quot;https://www.googleapis.com/auth/devstorage.read_only&quot;,&quot;https://www.googleapis.com/auth/logging.write&quot;,&quot;https://www.googleapis.com/auth/monitoring&quot;,&quot;https://www.googleapis.com/auth/servicecontrol&quot;,&quot;https://www.googleapis.com/auth/service.management.readonly&quot;,&quot;https://www.googleapis.com/auth/trace.append&quot; \</span>
+<span class="err">--num-nodes &quot;5&quot; --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0 &amp;&amp; gcloud beta container \</span>
+<span class="err">--project &quot;datamastering&quot; node-pools create &quot;coordinator-only&quot; --cluster &quot;my-cluster&quot; --zone &quot;us-central1-c&quot; \</span>
+<span class="err">--node-version &quot;1.15.12-gke.2&quot; --machine-type &quot;e2-custom-4-8192&quot; --image-type &quot;COS&quot; --disk-type &quot;pd-standard&quot; \</span>
+<span class="err">--disk-size &quot;10&quot; --metadata disable-legacy-endpoints=true \</span>
+<span class="err">--scopes &quot;https://www.googleapis.com/auth/devstorage.read_only&quot;,&quot;https://www.googleapis.com/auth/logging.write&quot;,&quot;https://www.googleapis.com/auth/monitoring&quot;,&quot;https://www.googleapis.com/auth/servicecontrol&quot;,&quot;https://www.googleapis.com/auth/service.management.readonly&quot;,&quot;https://www.googleapis.com/auth/trace.append&quot; \</span>
+<span class="err">--num-nodes &quot;2&quot; --enable-autoupgrade --enable-autorepair --max-surge-upgrade 1 --max-unavailable-upgrade 0</span>
+</code></pre></div>
+
+
+<blockquote>
+<p><strong><em>NOTE:</em></strong>  In case you are provisioning the cluster in console make sure to enable <code>Enable Computer Engine Persistent Disk CSI Driver</code> 
+under Features.</p>
+</blockquote>
+<h2>Enable Persistent Volume</h2>
+<p>Next we create the storage classes for our Elasticsearch cluster, Create new file called <code>storage.yaml</code> with the following content:</p>
+<div class="highlight"><pre><span></span><code><span class="n">allowVolumeExpansion</span><span class="o">:</span> <span class="kc">true</span>
+<span class="n">apiVersion</span><span class="o">:</span> <span class="n">storage</span><span class="o">.</span><span class="na">k8s</span><span class="o">.</span><span class="na">io</span><span class="o">/</span><span class="n">v1</span>
+<span class="n">kind</span><span class="o">:</span> <span class="n">StorageClass</span>
+<span class="n">metadata</span><span class="o">:</span>
+  <span class="n">name</span><span class="o">:</span> <span class="n">pd</span><span class="o">-</span><span class="n">ssd</span>
+<span class="n">parameters</span><span class="o">:</span>
+  <span class="n">type</span><span class="o">:</span> <span class="n">pd</span><span class="o">-</span><span class="n">ssd</span>
+<span class="n">provisioner</span><span class="o">:</span> <span class="n">pd</span><span class="o">.</span><span class="na">csi</span><span class="o">.</span><span class="na">storage</span><span class="o">.</span><span class="na">gke</span><span class="o">.</span><span class="na">io</span>
+<span class="n">reclaimPolicy</span><span class="o">:</span> <span class="n">Delete</span>
+<span class="n">volumeBindingMode</span><span class="o">:</span> <span class="n">Immediate</span>
+</code></pre></div>
+
+
+<p>Here we use <code>pd.csi.storage.gke.io</code> as our provisioner, this is the reason we enabled 
+<code>Enable Computer Engine Persistent Disk CSI Driver</code> under Features of cluster creation.</p>
+<p>In case you dont want to use the above provisioner you can also use the <code>kubernetes.io/gce-pd</code> as bellow.</p>
+<div class="highlight"><pre><span></span><code><span class="n">kind</span><span class="o">:</span> <span class="n">StorageClass</span>
+<span class="n">apiVersion</span><span class="o">:</span> <span class="n">storage</span><span class="o">.</span><span class="na">k8s</span><span class="o">.</span><span class="na">io</span><span class="o">/</span><span class="n">v1</span>
+<span class="n">metadata</span><span class="o">:</span>
+  <span class="n">name</span><span class="o">:</span> <span class="n">pd</span><span class="o">-</span><span class="n">ssd</span>
+<span class="n">provisioner</span><span class="o">:</span> <span class="n">kubernetes</span><span class="o">.</span><span class="na">io</span><span class="o">/</span><span class="n">gce</span><span class="o">-</span><span class="n">pd</span>
+<span class="n">parameters</span><span class="o">:</span>
+  <span class="n">type</span><span class="o">:</span> <span class="n">pd</span><span class="o">-</span><span class="n">ssd</span>
+  <span class="n">zone</span><span class="o">:</span> <span class="n">us</span><span class="o">-</span><span class="n">central1</span><span class="o">-</span><span class="n">c</span>
+</code></pre></div>
+
+
+<blockquote>
+<p><strong><em>NOTE:</em></strong>  Use only one of the above since we have used the same name for both, in case you want to use both the 
+configurations use different names for <code>pd-ssd</code>.</p>
+</blockquote>
+<p>Now to apply the changes to our cluster first get credentials of our cluster using the bellow command.</p>
+<p><code>gcloud container clusters get-credentials my-cluster --zone us-central1-c --project my-project</code></p>
+<p>To apply our changes use the below command.</p>
+<p><code>kubectl apply -f storage.yaml</code></p>
+<h2>Elasticsearch Node Discovery</h2>
+<p>Create new file called <code>service.yaml</code> with the following content.</p>
+<div class="highlight"><pre><span></span><code><span class="n">apiVersion</span><span class="o">:</span> <span class="n">v1</span>
+<span class="n">kind</span><span class="o">:</span> <span class="n">Service</span>
+<span class="n">metadata</span><span class="o">:</span>
+  <span class="n">labels</span><span class="o">:</span>
+  <span class="n">name</span><span class="o">:</span> <span class="n">elasticsearch</span><span class="o">-</span><span class="n">k8s</span><span class="o">-</span><span class="n">es</span><span class="o">-</span><span class="n">lb</span>
+  <span class="kd">namespace</span><span class="o">:</span> <span class="k">default</span>
+  <span class="n">annotations</span><span class="o">:</span>
+    <span class="err">#</span> <span class="n">NOTE</span><span class="o">:</span> <span class="n">We</span> <span class="n">recommend</span> <span class="n">only</span> <span class="n">exposing</span> <span class="n">ES</span> <span class="n">on</span> <span class="n">your</span> <span class="kd">internal</span> <span class="n">network</span>
+    <span class="n">cloud</span><span class="o">.</span><span class="na">google</span><span class="o">.</span><span class="na">com</span><span class="o">/</span><span class="n">load</span><span class="o">-</span><span class="n">balancer</span><span class="o">-</span><span class="n">type</span><span class="o">:</span> <span class="s2">&quot;Internal&quot;</span>
+    <span class="err">#</span> <span class="n">If</span> <span class="n">you</span> <span class="n">are</span> <span class="n">using</span> <span class="n">external</span> <span class="n">DNS</span> <span class="n">you</span> <span class="n">can</span> <span class="n">have</span> <span class="n">it</span> <span class="n">publish</span> <span class="n">the</span> <span class="n">dns</span> <span class="n">records</span>
+    <span class="err">#</span> <span class="k">for</span> <span class="k">this</span> <span class="n">service</span> <span class="k">for</span> <span class="n">you</span>
+    <span class="n">external</span><span class="o">-</span><span class="n">dns</span><span class="o">.</span><span class="na">alpha</span><span class="o">.</span><span class="na">kubernetes</span><span class="o">.</span><span class="na">io</span><span class="o">/</span><span class="n">hostname</span><span class="o">:</span> <span class="s2">&quot;es-lb.example.com.&quot;</span>
+    <span class="n">external</span><span class="o">-</span><span class="n">dns</span><span class="o">.</span><span class="na">alpha</span><span class="o">.</span><span class="na">kubernetes</span><span class="o">.</span><span class="na">io</span><span class="o">/</span><span class="n">ttl</span><span class="o">:</span> <span class="s2">&quot;30&quot;</span>
+<span class="n">spec</span><span class="o">:</span>
+  <span class="n">type</span><span class="o">:</span> <span class="n">LoadBalancer</span>
+  <span class="n">ports</span><span class="o">:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">https</span>
+    <span class="n">port</span><span class="o">:</span> <span class="mi">9200</span>
+    <span class="n">protocol</span><span class="o">:</span> <span class="n">TCP</span>
+    <span class="n">targetPort</span><span class="o">:</span> <span class="mi">9200</span>
+  <span class="n">selector</span><span class="o">:</span>
+    <span class="n">common</span><span class="o">.</span><span class="na">k8s</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="o">/</span><span class="n">type</span><span class="o">:</span> <span class="n">elasticsearch</span>
+    <span class="n">elasticsearch</span><span class="o">.</span><span class="na">k8s</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="o">/</span><span class="n">cluster</span><span class="o">-</span><span class="n">name</span><span class="o">:</span> <span class="n">elasticsearch</span><span class="o">-</span><span class="n">k8s</span>
+  <span class="n">sessionAffinity</span><span class="o">:</span> <span class="n">None</span>
+</code></pre></div>
+
+
+<p>Then enable the headless service using the following command</p>
+<p><code>kubectl apply -f service.yaml</code></p>
+<h2>Deploy Elasticsearch Cluster</h2>
+<p>The last step is to deploy the elasticsearch cluster, to deploy the ECK operator run,</p>
+<p><code>kubectl apply -f https://download.elastic.co/downloads/eck/1.2.0/all-in-one.yaml</code>
+This will deploy it into the elastic-system namespace. For latest version of the operator you find install instructions 
+<a href="https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-deploy-eck.html">here</a>.</p>
+<p>To deploy to our cluster create <code>elasticsearch.yaml</code> with the below content.</p>
+<div class="highlight"><pre><span></span><code><span class="n">apiVersion</span><span class="o">:</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="na">k8s</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="o">/</span><span class="n">v1</span>
+<span class="n">kind</span><span class="o">:</span> <span class="n">Elasticsearch</span>
+<span class="n">metadata</span><span class="o">:</span>
+  <span class="n">name</span><span class="o">:</span> <span class="n">elasticsearch</span><span class="o">-</span><span class="n">k8s</span>
+<span class="n">spec</span><span class="o">:</span>
+  <span class="n">version</span><span class="o">:</span> <span class="mf">6.8</span><span class="o">.</span><span class="mi">3</span>
+  <span class="n">nodeSets</span><span class="o">:</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">masters</span>
+    <span class="n">count</span><span class="o">:</span> <span class="mi">3</span>
+    <span class="n">podTemplate</span><span class="o">:</span>
+      <span class="n">spec</span><span class="o">:</span>
+        <span class="n">containers</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">master</span><span class="o">-</span><span class="n">nodes</span>
+          <span class="n">image</span><span class="o">:</span> <span class="n">docker</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="sr">/elasticsearch/</span><span class="n">elasticsearch</span><span class="o">:</span><span class="mf">6.8</span><span class="o">.</span><span class="mi">3</span>
+          <span class="n">env</span><span class="o">:</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">ES_JAVA_OPTS</span>
+            <span class="n">value</span><span class="o">:</span> <span class="o">-</span><span class="n">Xms6g</span> <span class="o">-</span><span class="n">Xmx6g</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">cluster</span><span class="o">.</span><span class="na">name</span>
+            <span class="n">value</span><span class="o">:</span> <span class="n">my</span><span class="o">-</span><span class="n">cluster</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">node</span><span class="o">.</span><span class="na">name</span>
+            <span class="n">value</span><span class="o">:</span> <span class="n">master</span><span class="o">-</span><span class="n">nodes</span>
+          <span class="n">resources</span><span class="o">:</span>
+            <span class="n">requests</span><span class="o">:</span>
+              <span class="n">memory</span><span class="o">:</span> <span class="mi">8</span><span class="n">Gi</span>
+              <span class="n">cpu</span><span class="o">:</span> <span class="mi">2</span>
+            <span class="n">limits</span><span class="o">:</span>
+              <span class="n">memory</span><span class="o">:</span> <span class="mi">8</span><span class="n">Gi</span>
+              <span class="n">cpu</span><span class="o">:</span> <span class="mi">2</span>
+        <span class="n">initContainers</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">sysctl</span>
+          <span class="n">securityContext</span><span class="o">:</span>
+            <span class="n">privileged</span><span class="o">:</span> <span class="kc">true</span>
+          <span class="n">command</span><span class="o">:</span> <span class="o">[</span><span class="s1">&#39;sh&#39;</span><span class="o">,</span> <span class="s1">&#39;-c&#39;</span><span class="o">,</span> <span class="s1">&#39;sysctl -w vm.max_map_count=262144&#39;</span><span class="o">]</span>
+        <span class="err">#</span> <span class="n">see</span> <span class="n">https</span><span class="o">://</span><span class="n">www</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="sr">/guide/en/cloud-on-k8s/current/</span><span class="n">k8s</span><span class="o">-</span><span class="n">init</span><span class="o">-</span><span class="n">containers</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">downloads</span><span class="o">.</span><span class="na">html</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">install</span><span class="o">-</span><span class="n">plugins</span>
+          <span class="n">command</span><span class="o">:</span>
+          <span class="o">-</span> <span class="n">sh</span>
+          <span class="o">-</span> <span class="o">-</span><span class="n">c</span>
+          <span class="o">-</span> <span class="o">|</span>
+            <span class="n">bin</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="n">plugin</span> <span class="n">install</span> <span class="o">--</span><span class="n">batch</span> <span class="n">repository</span><span class="o">-</span><span class="n">gcs</span>
+    <span class="n">config</span><span class="o">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="na">master</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="n">node</span><span class="o">.</span><span class="na">data</span><span class="o">:</span> <span class="kc">false</span>
+      <span class="n">node</span><span class="o">.</span><span class="na">ingest</span><span class="o">:</span> <span class="kc">false</span>
+      <span class="n">script</span><span class="o">.</span><span class="na">allowed_types</span><span class="o">:</span> <span class="n">inline</span>
+      <span class="n">path</span><span class="o">.</span><span class="na">repo</span><span class="o">:</span> <span class="o">/</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">fielddata</span><span class="o">.</span><span class="na">cache</span><span class="o">.</span><span class="na">size</span><span class="o">:</span> <span class="mi">20</span><span class="o">%</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">query</span><span class="o">.</span><span class="na">bool</span><span class="o">.</span><span class="na">max_clause_count</span><span class="o">:</span> <span class="mi">4096</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">memory</span><span class="o">.</span><span class="na">index_buffer_size</span><span class="o">:</span> <span class="s2">&quot;25%&quot;</span>
+    <span class="n">volumeClaimTemplates</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">metadata</span><span class="o">:</span>
+        <span class="n">name</span><span class="o">:</span> <span class="n">masters</span><span class="o">-</span><span class="n">data</span>
+      <span class="n">spec</span><span class="o">:</span>
+        <span class="n">accessModes</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">ReadWriteOnce</span>
+        <span class="n">resources</span><span class="o">:</span>
+          <span class="n">requests</span><span class="o">:</span>
+            <span class="n">storage</span><span class="o">:</span> <span class="mi">500</span><span class="n">Gi</span>
+        <span class="n">storageClassName</span><span class="o">:</span> <span class="n">pd</span><span class="o">-</span><span class="n">ssd</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">data</span><span class="o">-</span><span class="n">nodes</span>
+    <span class="n">count</span><span class="o">:</span> <span class="mi">5</span>
+    <span class="n">podTemplate</span><span class="o">:</span>
+      <span class="n">spec</span><span class="o">:</span>
+        <span class="n">containers</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">data</span><span class="o">-</span><span class="n">nodes</span>
+          <span class="n">image</span><span class="o">:</span> <span class="n">docker</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="sr">/elasticsearch/</span><span class="n">elasticsearch</span><span class="o">:</span><span class="mf">6.8</span><span class="o">.</span><span class="mi">3</span>
+          <span class="n">env</span><span class="o">:</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">ES_JAVA_OPTS</span>
+            <span class="n">value</span><span class="o">:</span> <span class="o">-</span><span class="n">Xms28g</span> <span class="o">-</span><span class="n">Xmx28g</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">cluster</span><span class="o">.</span><span class="na">name</span>
+            <span class="n">value</span><span class="o">:</span> <span class="n">my</span><span class="o">-</span><span class="n">cluster</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">node</span><span class="o">.</span><span class="na">name</span>
+            <span class="n">value</span><span class="o">:</span> <span class="n">data</span><span class="o">-</span><span class="n">nodes</span>
+          <span class="n">resources</span><span class="o">:</span>
+            <span class="n">requests</span><span class="o">:</span>
+              <span class="n">memory</span><span class="o">:</span> <span class="mi">36</span><span class="n">Gi</span>
+              <span class="n">cpu</span><span class="o">:</span> <span class="mi">4</span>
+            <span class="n">limits</span><span class="o">:</span>
+              <span class="n">memory</span><span class="o">:</span> <span class="mi">36</span><span class="n">Gi</span>
+              <span class="n">cpu</span><span class="o">:</span> <span class="mi">4</span>
+        <span class="n">initContainers</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">sysctl</span>
+          <span class="n">securityContext</span><span class="o">:</span>
+            <span class="n">privileged</span><span class="o">:</span> <span class="kc">true</span>
+          <span class="n">command</span><span class="o">:</span> <span class="o">[</span><span class="s1">&#39;sh&#39;</span><span class="o">,</span> <span class="s1">&#39;-c&#39;</span><span class="o">,</span> <span class="s1">&#39;sysctl -w vm.max_map_count=262144&#39;</span><span class="o">]</span>
+        <span class="err">#</span> <span class="n">see</span> <span class="n">https</span><span class="o">://</span><span class="n">www</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="sr">/guide/en/cloud-on-k8s/current/</span><span class="n">k8s</span><span class="o">-</span><span class="n">init</span><span class="o">-</span><span class="n">containers</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">downloads</span><span class="o">.</span><span class="na">html</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">install</span><span class="o">-</span><span class="n">plugins</span>
+          <span class="n">command</span><span class="o">:</span>
+          <span class="o">-</span> <span class="n">sh</span>
+          <span class="o">-</span> <span class="o">-</span><span class="n">c</span>
+          <span class="o">-</span> <span class="o">|</span>
+            <span class="n">bin</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="n">plugin</span> <span class="n">install</span> <span class="o">--</span><span class="n">batch</span> <span class="n">repository</span><span class="o">-</span><span class="n">gcs</span>
+    <span class="n">config</span><span class="o">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="na">master</span><span class="o">:</span> <span class="kc">false</span>
+      <span class="n">node</span><span class="o">.</span><span class="na">data</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="n">script</span><span class="o">.</span><span class="na">allowed_types</span><span class="o">:</span> <span class="n">inline</span>
+      <span class="n">path</span><span class="o">.</span><span class="na">repo</span><span class="o">:</span> <span class="o">/</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">fielddata</span><span class="o">.</span><span class="na">cache</span><span class="o">.</span><span class="na">size</span><span class="o">:</span> <span class="mi">20</span><span class="o">%</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">query</span><span class="o">.</span><span class="na">bool</span><span class="o">.</span><span class="na">max_clause_count</span><span class="o">:</span> <span class="mi">4096</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">memory</span><span class="o">.</span><span class="na">index_buffer_size</span><span class="o">:</span> <span class="s2">&quot;25%&quot;</span>
+    <span class="n">volumeClaimTemplates</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">metadata</span><span class="o">:</span>
+        <span class="n">name</span><span class="o">:</span> <span class="n">elasticsearch</span><span class="o">-</span><span class="n">data</span>
+      <span class="n">spec</span><span class="o">:</span>
+        <span class="n">accessModes</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">ReadWriteOnce</span>
+        <span class="n">resources</span><span class="o">:</span>
+          <span class="n">requests</span><span class="o">:</span>
+            <span class="n">storage</span><span class="o">:</span> <span class="mi">500</span><span class="n">Gi</span>
+        <span class="n">storageClassName</span><span class="o">:</span> <span class="n">pd</span><span class="o">-</span><span class="n">ssd</span>
+  <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">coordinator</span><span class="o">-</span><span class="n">only</span>
+    <span class="n">count</span><span class="o">:</span> <span class="mi">2</span>
+    <span class="n">podTemplate</span><span class="o">:</span>
+      <span class="n">spec</span><span class="o">:</span>
+        <span class="n">containers</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">coordinator</span><span class="o">-</span><span class="n">only</span>
+          <span class="n">image</span><span class="o">:</span> <span class="n">docker</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="sr">/elasticsearch/</span><span class="n">elasticsearch</span><span class="o">:</span><span class="mf">6.8</span><span class="o">.</span><span class="mi">3</span>
+          <span class="n">env</span><span class="o">:</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">ES_JAVA_OPTS</span>
+            <span class="n">value</span><span class="o">:</span> <span class="o">-</span><span class="n">Xms4g</span> <span class="o">-</span><span class="n">Xmx4g</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">cluster</span><span class="o">.</span><span class="na">name</span>
+            <span class="n">value</span><span class="o">:</span> <span class="n">my</span><span class="o">-</span><span class="n">cluster</span>
+          <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">node</span><span class="o">.</span><span class="na">name</span>
+            <span class="n">value</span><span class="o">:</span> <span class="n">coordinator</span><span class="o">-</span><span class="n">only</span>
+          <span class="n">resources</span><span class="o">:</span>
+            <span class="n">requests</span><span class="o">:</span>
+              <span class="n">memory</span><span class="o">:</span> <span class="mi">6</span><span class="n">Gi</span>
+              <span class="n">cpu</span><span class="o">:</span> <span class="mi">2</span>
+            <span class="n">limits</span><span class="o">:</span>
+              <span class="n">memory</span><span class="o">:</span> <span class="mi">6</span><span class="n">Gi</span>
+              <span class="n">cpu</span><span class="o">:</span> <span class="mi">3</span>
+        <span class="n">initContainers</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">sysctl</span>
+          <span class="n">securityContext</span><span class="o">:</span>
+            <span class="n">privileged</span><span class="o">:</span> <span class="kc">true</span>
+          <span class="n">command</span><span class="o">:</span> <span class="o">[</span><span class="s1">&#39;sh&#39;</span><span class="o">,</span> <span class="s1">&#39;-c&#39;</span><span class="o">,</span> <span class="s1">&#39;sysctl -w vm.max_map_count=262144&#39;</span><span class="o">]</span>
+        <span class="err">#</span> <span class="n">see</span> <span class="n">https</span><span class="o">://</span><span class="n">www</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="sr">/guide/en/cloud-on-k8s/current/</span><span class="n">k8s</span><span class="o">-</span><span class="n">init</span><span class="o">-</span><span class="n">containers</span><span class="o">-</span><span class="n">plugin</span><span class="o">-</span><span class="n">downloads</span><span class="o">.</span><span class="na">html</span>
+        <span class="o">-</span> <span class="n">name</span><span class="o">:</span> <span class="n">install</span><span class="o">-</span><span class="n">plugins</span>
+          <span class="n">command</span><span class="o">:</span>
+          <span class="o">-</span> <span class="n">sh</span>
+          <span class="o">-</span> <span class="o">-</span><span class="n">c</span>
+          <span class="o">-</span> <span class="o">|</span>
+            <span class="n">bin</span><span class="o">/</span><span class="n">elasticsearch</span><span class="o">-</span><span class="n">plugin</span> <span class="n">install</span> <span class="o">--</span><span class="n">batch</span> <span class="n">repository</span><span class="o">-</span><span class="n">gcs</span>
+    <span class="n">config</span><span class="o">:</span>
+      <span class="n">node</span><span class="o">.</span><span class="na">master</span><span class="o">:</span> <span class="kc">false</span>
+      <span class="n">node</span><span class="o">.</span><span class="na">data</span><span class="o">:</span> <span class="kc">false</span>
+      <span class="n">node</span><span class="o">.</span><span class="na">ingest</span><span class="o">:</span> <span class="kc">true</span>
+      <span class="n">script</span><span class="o">.</span><span class="na">allowed_types</span><span class="o">:</span> <span class="n">inline</span>
+      <span class="n">path</span><span class="o">.</span><span class="na">repo</span><span class="o">:</span> <span class="o">/</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">fielddata</span><span class="o">.</span><span class="na">cache</span><span class="o">.</span><span class="na">size</span><span class="o">:</span> <span class="mi">20</span><span class="o">%</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">query</span><span class="o">.</span><span class="na">bool</span><span class="o">.</span><span class="na">max_clause_count</span><span class="o">:</span> <span class="mi">4096</span>
+      <span class="n">indices</span><span class="o">.</span><span class="na">memory</span><span class="o">.</span><span class="na">index_buffer_size</span><span class="o">:</span> <span class="s2">&quot;25%&quot;</span>
+    <span class="n">volumeClaimTemplates</span><span class="o">:</span>
+    <span class="o">-</span> <span class="n">metadata</span><span class="o">:</span>
+        <span class="n">name</span><span class="o">:</span> <span class="n">coordinator</span><span class="o">-</span><span class="n">data</span>
+      <span class="n">spec</span><span class="o">:</span>
+        <span class="n">accessModes</span><span class="o">:</span>
+        <span class="o">-</span> <span class="n">ReadWriteOnce</span>
+        <span class="n">resources</span><span class="o">:</span>
+          <span class="n">requests</span><span class="o">:</span>
+            <span class="n">storage</span><span class="o">:</span> <span class="mi">500</span><span class="n">Gi</span>
+        <span class="n">storageClassName</span><span class="o">:</span> <span class="n">pd</span><span class="o">-</span><span class="n">ssd</span>
+  <span class="n">http</span><span class="o">:</span>
+    <span class="n">service</span><span class="o">:</span>
+      <span class="n">spec</span><span class="o">:</span>
+        <span class="n">type</span><span class="o">:</span> <span class="n">ClusterIP</span>
+    <span class="err">#</span> <span class="n">see</span> <span class="n">https</span><span class="o">://</span><span class="n">www</span><span class="o">.</span><span class="na">elastic</span><span class="o">.</span><span class="na">co</span><span class="sr">/guide/en/cloud-on-k8s/current/</span><span class="n">k8s</span><span class="o">-</span><span class="n">custom</span><span class="o">-</span><span class="n">http</span><span class="o">-</span><span class="n">certificate</span><span class="o">.</span><span class="na">html</span>
+    <span class="err">#</span> <span class="n">tls</span><span class="o">:</span>
+    <span class="err">#</span>   <span class="n">certificate</span><span class="o">:</span>
+    <span class="err">#</span>     <span class="n">secretName</span><span class="o">:</span> <span class="s2">&quot;example.com&quot;</span>
+</code></pre></div>
+
+
+<p>To apply the yaml use the bellow command
+<code>kubectl apply -f elasticsearch.yaml</code></p>
+<p>Now your cluster must be up, confirm the same in Workloads section in the console or you can use the bellow command and see
+if all the pods are in running state.
+<code>kubectl get pods</code></p>
+<h2>Test Your Cluster</h2>
+<p>To verify that your cluster is working fine use the below commands to access the content of the cluster</p>
+<div class="highlight"><pre><span></span><code><span class="x"># get the generated password</span>
+<span class="x">PASSWORD=$(kubectl get secret elasticsearch-k8s-es-elastic-user -o go-template=&#39;</span><span class="cp">{{</span><span class="nv">.data.elastic</span> <span class="o">|</span> <span class="nf">base64decode</span><span class="cp">}}</span><span class="x">&#39;)</span>
+
+<span class="x"># using the load balancer we created</span>
+<span class="x">ENDPOINT=$(kubectl get svc elasticsearch-k8s-es-lb -o go-template=&#39;</span><span class="cp">{{</span> <span class="o">(</span><span class="nv">index</span> <span class="nv">.status.loadBalancer.ingress</span> <span class="m">0</span><span class="o">)</span><span class="nv">.ip</span> <span class="cp">}}</span><span class="x">&#39;)</span>
+<span class="x">curl -u &quot;elastic:$PASSWORD&quot; -k https://$ENDPOINT:9200</span>
+
+<span class="x"># To test locally can set up proxy</span>
+<span class="x">kubectl port-forward service/elasticsearch-k8s-es-http 9200</span>
+<span class="x">curl -u &quot;elastic:$PASSWORD&quot; -k &quot;https://localhost:9200&quot;</span>
+</code></pre></div>                </article>
             </aside><!-- /#featured -->
         <section id="extras" class="body">
                 <div class="blogroll">
@@ -57,7 +352,6 @@ Here I share my experience on creating an Elasticsearch Cluster on Google Kubern
                 <div class="social">
                         <h2>social</h2>
                         <ul>
-                            <li><a href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
 
                             <li><a href="https://www.linkedin.com/in/kishore-chandran-90456776/">Linkedin</a></li>
                             <li><a href="https://twitter.com/kishorec41">Twitter</a></li>
