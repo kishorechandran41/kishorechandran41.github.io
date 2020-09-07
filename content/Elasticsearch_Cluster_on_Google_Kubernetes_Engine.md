@@ -20,3 +20,4 @@ These are the following steps involved in the process,
 4. Deploy the Elasticsearch Cluster via [Stateful Sets](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
 
 ## Provisioning the Cluster
+

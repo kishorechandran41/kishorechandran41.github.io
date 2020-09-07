@@ -21,12 +21,11 @@ AUTHOR_FEED_RSS = None
 # Blogroll
 LINKS = (('Pelican', 'https://getpelican.com/'),
          ('Python.org', 'https://www.python.org/'),
-         ('Jinja2', 'https://palletsprojects.com/p/jinja/'),
-         ('You can modify those links in your config file', '#'),)
+         ('Jinja2', 'https://palletsprojects.com/p/jinja/'),)
 
 # Social widget
-SOCIAL = (('You can add links in your config file', '#'),
-          ('Another social link', '#'),)
+SOCIAL = (('Linkedin', 'https://www.linkedin.com/in/kishore-chandran-90456776/'),
+          ('Twitter', 'https://twitter.com/kishorec41'),)
 
 DEFAULT_PAGINATION = 10
 
