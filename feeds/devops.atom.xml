@@ -10,7 +10,7 @@ Here I share my experience on creating an Elasticsearch Cluster on Google Kubern
 &lt;li&gt;Deploy Elasticsearch Cluster using &lt;a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/"&gt;Stateful Sets&lt;/a&gt;.&lt;/li&gt;
 &lt;/ol&gt;
 &lt;h2&gt;Provisioning the Cluster&lt;/h2&gt;
-&lt;p&gt;Let us first provision the clusters in Google Kubernetes Engine for our Elasticsearch. We are going to create 3 node pools as below,&lt;/p&gt;
+&lt;p&gt;Let us first provision the clusters in Google Kubernetes Engine for our Elasticsearch. We are going to create three node pools as below,&lt;/p&gt;
 &lt;ol&gt;
 &lt;li&gt;master-nodes - 3 nodes with 2vCPU, 8GB Memory and Standard persistent disk of 10GB as default&lt;/li&gt;
 &lt;li&gt;data-nodes - 5 nodes with 16vCPU, 64GB Memory and Standard persistent disk of 10GB as default&lt;/li&gt;
@@ -294,6 +294,7 @@ This will deploy it into the elastic-system namespace. For latest version of the
 &lt;p&gt;Now your cluster must be up, confirm the same in Workloads section in the console or you can use the bellow command and see
 if all the pods are in running state.
 &lt;code&gt;kubectl get pods&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;In case you want to add more configurations to the elasticsearch.yaml you can refer &lt;a href="https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-elasticsearch-specification.html"&gt;here&lt;/a&gt;.&lt;/p&gt;
 &lt;h2&gt;Test Your Cluster&lt;/h2&gt;
 &lt;p&gt;To verify that your cluster is working fine use the below commands to access the content of the cluster&lt;/p&gt;
 &lt;div class="highlight"&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="x"&gt;# get the generated password&lt;/span&gt;

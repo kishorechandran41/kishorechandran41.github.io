@@ -44,7 +44,7 @@ Here I share my experience on creating an Elasticsearch Cluster on Google Kubern
 <li>Deploy Elasticsearch Cluster using <a href="https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/">Stateful Sets</a>.</li>
 </ol>
 <h2>Provisioning the Cluster</h2>
-<p>Let us first provision the clusters in Google Kubernetes Engine for our Elasticsearch. We are going to create 3 node pools as below,</p>
+<p>Let us first provision the clusters in Google Kubernetes Engine for our Elasticsearch. We are going to create three node pools as below,</p>
 <ol>
 <li>master-nodes - 3 nodes with 2vCPU, 8GB Memory and Standard persistent disk of 10GB as default</li>
 <li>data-nodes - 5 nodes with 16vCPU, 64GB Memory and Standard persistent disk of 10GB as default</li>
@@ -328,6 +328,7 @@ This will deploy it into the elastic-system namespace. For latest version of the
 <p>Now your cluster must be up, confirm the same in Workloads section in the console or you can use the bellow command and see
 if all the pods are in running state.
 <code>kubectl get pods</code></p>
+<p>In case you want to add more configurations to the elasticsearch.yaml you can refer <a href="https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-elasticsearch-specification.html">here</a>.</p>
 <h2>Test Your Cluster</h2>
 <p>To verify that your cluster is working fine use the below commands to access the content of the cluster</p>
 <div class="highlight"><pre><span></span><code><span class="x"># get the generated password</span>
