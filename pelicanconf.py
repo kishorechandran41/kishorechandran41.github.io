@@ -27,7 +27,7 @@ SOCIAL = (('Linkedin', 'https://www.linkedin.com/in/kishore-chandran-90456776/')
           ('Twitter', 'https://twitter.com/kishorec41'),)
 
 DEFAULT_PAGINATION = 10
-THEME = 'theme/pure'
+THEME = 'themes/pure'
 # can get more from git clone --recursive https://github.com/getpelican/pelican-themes themes
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
