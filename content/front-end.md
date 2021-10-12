@@ -2,10 +2,10 @@ Title: My Front End Environment Learnings
 Date: 2020-10-12 17:30
 Modified: 2020-10-12 17:30
 Category: Front End
-Tags: Elasticsearch, Kubernetes
-Slug: My-Front-End-Environment-Learnings 
+Tags: Front End
+Slug: My-Front-End-Learnings 
 Authors: Kishore Chandran
-Summary: My Front End Environment Learnings 
+Summary: My Front End Learnings, not much just a start.
 
 
 ### Environment
