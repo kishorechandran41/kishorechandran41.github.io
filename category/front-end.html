@@ -1,124 +1,100 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <meta name="generator" content="Pelican" />
-        <title>Kishore's Blog - Front End</title>
-        <link rel="stylesheet" href="https://kishorechandran41.github.io/theme/css/main.css" />
-        <link href="https://kishorechandran41.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Kishore's Blog Atom Feed" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Kishore's Blog, ">
+
+        <link rel="alternate"  href="https://kishorechandran41.github.io/feeds/all.atom.xml" type="application/atom+xml" title="Kishore's Blog Full Atom Feed"/>
+
+        <title>Front End category // Kishore's Blog // </title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://kishorechandran41.github.io/theme/css/pure.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 </head>
 
-<body id="index" class="home">
-        <header id="banner" class="body">
-                <h1><a href="https://kishorechandran41.github.io/">Kishore's Blog</a></h1>
-                <nav><ul>
-                    <li><a href="https://kishorechandran41.github.io/category/devops.html">DevOps</a></li>
-                    <li class="active"><a href="https://kishorechandran41.github.io/category/front-end.html">Front End</a></li>
-                </ul></nav>
-        </header><!-- /#banner -->
+<body>
+<div class="pure-g-r" id="layout">
+<div class="sidebar pure-u">
+    <div class="cover-img" style="background-image: url('')">
+        <div class="cover-body">
+            <header class="header">
+                <hgroup>
+                    <h1 class="brand-main"><a href="/">Kishore's Blog</a></h1>
+                    <p class="tagline"></p>
+                    <p class="social">
+                        <a href="https://www.linkedin.com/in/kishore-chandran-90456776/">
+                            <i class="fa fa-Linkedin fa-3x"></i>
+                        </a>
+                        <a href="https://twitter.com/kishorec41">
+                            <i class="fa fa-Twitter fa-3x"></i>
+                        </a>
+                    <p>
+                </hgroup>
+            </header>
+        </div>
+    </div>
+</div>    <div class="pure-u-1">
+        <div class="content">
+            <!-- A wrapper for all the blog posts -->
+            <div class="posts">
+                <h1 class="content-subhead">
+Posts in 'Front End'                </h1>
+<section class="post">
+    <header class="post-header">
+        <a href="https://kishorechandran41.github.io/author/kishore-chandran.html" title="See posts by Kishore Chandran">
+        </a>
+        <h3><a class="post-title" href="https://kishorechandran41.github.io/My-Front-End-Learnings.html">My Front End Environment Learnings</a></h3>
+            <p class="post-meta"><p>My Front End Learnings, not much just a start.</p></p>
+            <p class="post-meta">
+                in <a href="https://kishorechandran41.github.io/category/front-end.html">Front End</a> &middot; Mon 12 October 2020
+            </p>
+    </header>
+</section><div class="pagination-wrapper content-subhead">
+    <div class="pagination">
+        <div class="pagination-left">
+                &nbsp;
+        </div>
+        <span>Page 1 / 1</span>
+        <div class="pagination-right">
+        </div>
+    </div>
+</div><footer class="footer">
+    <p>&copy; Kishore's Blog &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>            </div>
+        </div>
+    </div>
+</div>
+    <script>
+        var $top = $('.go-top');
 
-            <aside id="featured" class="body">
-                <article>
-                    <h1 class="entry-title"><a href="https://kishorechandran41.github.io/My-Front-End-Environment-Learnings.html">My Front End Environment Learnings</a></h1>
-<footer class="post-info">
-        <abbr class="published" title="2020-10-12T17:30:00+05:30">
-                Published: Mon 12 October 2020
-        </abbr>
-		<br />
-        <abbr class="modified" title="2020-10-12T17:30:00+05:30">
-                Updated: Mon 12 October 2020
-        </abbr>
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
 
-        <address class="vcard author">
-                By                         <a class="url fn" href="https://kishorechandran41.github.io/author/kishore-chandran.html">Kishore Chandran</a>
-        </address>
-<p>In <a href="https://kishorechandran41.github.io/category/front-end.html">Front End</a>.</p>
-<p>tags: <a href="https://kishorechandran41.github.io/tag/elasticsearch.html">Elasticsearch</a> <a href="https://kishorechandran41.github.io/tag/kubernetes.html">Kubernetes</a> </p>
-</footer><!-- /.post-info --><h3>Environment</h3>
-<p>This is the basic requirement for a system to do with its operation
-some explanations are as below,</p>
-<h4>OS StartUp</h4>
-<ul>
-<li>Turn on, the bootloader gets loaded</li>
-<li>Magic number is sent to RAM</li>
-<li>Program Counter gets initialized </li>
-<li>Here the BIOS is set up and ready to start</li>
-<li>Hardware is initialized -&gt; IO and Memory</li>
-<li>Now the control transfers to GREB</li>
-<li>GREB inits RAM's full capability by Initializing STACK and HEAP for OS</li>
-<li>C Tool chains and headers are initialized</li>
-<li>Garbage Collector processes started</li>
-</ul>
-<p>If above is the environment required to run the OS similarly we need environments to 
-run our code, once such environment is Google's V8.</p>
-<h3>Google's V8</h3>
-<p>V8 engine is a runtime environment for our code to run in Google Chrome.</p>
-<div class="highlight"><pre><span></span><code><span class="o">+------------------------------------------------------------------------------------------+</span>
-<span class="o">|</span> <span class="nv">Google</span> <span class="nv">Chrome</span>                                                                            <span class="o">|</span>
-<span class="o">|</span>                                                                                          <span class="o">|</span>
-<span class="o">|</span> <span class="o">+----------------------------------------+</span>          <span class="o">+------------------------------+</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="nv">Google</span> <span class="nv">V8</span>                              <span class="o">|</span>          <span class="o">|</span>            <span class="nv">WebAPIs</span>           <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="o">+-------------+</span> <span class="o">+---------------+</span>      <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="o">|</span>    <span class="nv">Heap</span>     <span class="o">|</span> <span class="o">|</span>     <span class="nv">Stack</span>     <span class="o">|</span>      <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>               <span class="o">|</span>      <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>               <span class="o">|</span>      <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>               <span class="o">|</span>      <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>               <span class="o">|</span>      <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="o">|</span>             <span class="o">|</span> <span class="o">|</span>               <span class="o">|</span>      <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span> <span class="o">+-------------+</span> <span class="o">+---------------+</span>      <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span>                                        <span class="o">|</span>          <span class="o">|</span>                              <span class="o">|</span>     <span class="o">|</span>
-<span class="o">|</span> <span class="o">+----------------------------------------+</span>          <span class="o">+------------------------------+</span>     <span class="o">|</span>
-<span class="o">|</span>                                                                                          <span class="o">|</span>
-<span class="o">|</span>                                                                                          <span class="o">|</span>
-<span class="o">|</span> <span class="o">+---------------------+</span>     <span class="o">+---------------------------------------+</span>                    <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span>     <span class="nv">Event</span> <span class="k">loop</span>      <span class="o">|</span>     <span class="o">|</span>          <span class="nv">Task</span><span class="o">/</span><span class="nv">Callback</span> <span class="nv">queue</span>          <span class="o">|</span>                    <span class="o">|</span>
-<span class="o">|</span> <span class="o">|</span>                     <span class="o">|</span>     <span class="o">|</span>                                       <span class="o">|</span>                    <span class="o">|</span>
-<span class="o">|</span> <span class="o">+---------------------+</span>     <span class="o">+---------------------------------------+</span>                    <span class="o">|</span>
-<span class="o">|</span>                             <span class="o">+---------------------------------------+</span>                    <span class="o">|</span>
-<span class="o">|</span>                             <span class="o">|</span>          <span class="nv">Microtask</span> <span class="nv">queue</span>              <span class="o">|</span>                    <span class="o">|</span>
-<span class="o">|</span>                             <span class="o">|</span>                                       <span class="o">|</span>                    <span class="o">|</span>
-<span class="o">|</span>                             <span class="o">+---------------------------------------+</span>                    <span class="o">|</span>
-<span class="o">|</span>                                                                                          <span class="o">|</span>
-<span class="o">|</span>                                                                                          <span class="o">|</span>
-<span class="o">+------------------------------------------------------------------------------------------+</span>
-</code></pre></div>
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
 
-<p>V8 can act as an Interpreter and Compiler -&gt; Just in time compiler.
-Something that is to be noted about the V8 is how it manages its stack and heap, 
-an element that is created in the environment is not destroyed until its manually removed.</p>
-<p>It is to be noted that V8 runs on single thread and we must not push any high processing tasks.
-The multithreading and high processing tasks are handled by Google Chrome using Event Loop and Task/Callback queue.</p>
-<h3>Node.js</h3>
-<p>Node.js is also an JavaScript runtime just like V8, which can be used to run .js files 
-from the console or terminal.</p>                </article>
-            </aside><!-- /#featured -->
-        <section id="extras" class="body">
-                <div class="blogroll">
-                        <h2>links</h2>
-                        <ul>
-                            <li><a href="https://getpelican.com/">Pelican</a></li>
-                            <li><a href="https://www.python.org/">Python.org</a></li>
-                        </ul>
-                </div><!-- /.blogroll -->
-                <div class="social">
-                        <h2>social</h2>
-                        <ul>
-                            <li><a href="https://kishorechandran41.github.io/feeds/all.atom.xml" type="application/atom+xml" rel="alternate">atom feed</a></li>
-
-                            <li><a href="https://www.linkedin.com/in/kishore-chandran-90456776/">Linkedin</a></li>
-                            <li><a href="https://twitter.com/kishorec41">Twitter</a></li>
-                        </ul>
-                </div><!-- /.social -->
-        </section><!-- /#extras -->
-
-        <footer id="contentinfo" class="body">
-                <address id="about" class="vcard body">
-                Proudly powered by <a href="https://getpelican.com/">Pelican</a>, which takes great advantage of <a href="https://www.python.org/">Python</a>.
-                </address><!-- /#about -->
-
-                <p>The theme is by <a href="https://www.smashingmagazine.com/2009/08/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
-        </footer><!-- /#contentinfo -->
-
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
 </body>
 </html>
